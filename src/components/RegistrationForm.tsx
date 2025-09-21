@@ -516,7 +516,7 @@ const RegistrationForm: React.FC = () => {
                 value={formData.branch || ''}
                 onChange={(e) => updateFormField('branch', e.target.value)}
                 required
-                className="w-full border rounded p-2"
+                className="w-full border rounded p-2 bg-[#121417]"
               >
                 <option value="">Select branch</option>
                 <option value="CSE">CSE</option>
@@ -536,13 +536,13 @@ const RegistrationForm: React.FC = () => {
                 value={formData.year || ''}
                 onChange={(e) => updateFormField('year', e.target.value)}
                 required
-                className="w-full border rounded p-2"
+                className="w-full border rounded p-2 bg-[#121417]"
               >
                 <option value="">Select year</option>
-                <option value="1st">1st</option>
+                {/* <option value="1st">1st</option> */}
                 <option value="2nd">2nd</option>
-                <option value="3rd">3rd</option>
-                <option value="4th">4th</option>
+                {/* <option value="3rd">3rd</option>
+                <option value="4th">4th</option> */}
               </select>
             </div>
 

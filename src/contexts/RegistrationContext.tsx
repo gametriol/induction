@@ -25,7 +25,23 @@ interface RegistrationProviderProps {
 }
 
 export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ children }) => {
-  const [registrationData, setRegistrationData] = useState<RegistrationData | null>(null);
+  const [registrationData, setRegistrationDataState] = useState<RegistrationData | null>(() => {
+    try {
+      const raw = sessionStorage.getItem('flux_registrationData');
+      return raw ? (JSON.parse(raw) as RegistrationData) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+  // wrapper to keep sessionStorage in sync
+  const setRegistrationData = (data: RegistrationData) => {
+    try {
+      sessionStorage.setItem('flux_registrationData', JSON.stringify(data));
+    } catch (e) {
+      // ignore storage errors
+    }
+    setRegistrationDataState(data);
+  };
   const [formData, setFormData] = useState<Partial<User>>({});
 
   const updateFormField = (field: keyof User, value: string | File) => {
@@ -36,7 +52,12 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ chil
   };
 
   const clearRegistration = () => {
-    setRegistrationData(null);
+    try {
+      sessionStorage.removeItem('flux_registrationData');
+    } catch (e) {
+      // ignore
+    }
+    setRegistrationDataState(null);
     setFormData({});
   };
 

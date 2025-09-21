@@ -1,244 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Textarea } from '@/components/ui/textarea';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Badge } from '@/components/ui/badge';
-// import { useToast } from '@/hooks/use-toast';
-// import { Loader2, Upload, CheckCircle2, ArrowLeft, User, FileText, Trophy } from 'lucide-react';
-// import { useRegistration } from '@/contexts/RegistrationContext';
-// import { useNavigate } from 'react-router-dom';
-// import { 
-//   validateWordCount, 
-//   validateMobileNumber, 
-//   validateFileSize, 
-//   validateImageType 
-// } from '@/utils/validation';
-// import { COLLEGE_BRANCHES, ACADEMIC_YEARS, FormErrors } from '@/types';
-
-// const RegistrationForm: React.FC = () => {
-//   const navigate = useNavigate();
-//   const { toast } = useToast();
-//   const { registrationData, formData, updateFormField } = useRegistration();
-  
-//   const [errors, setErrors] = useState<FormErrors>({});
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [submitSuccess, setSubmitSuccess] = useState(false);
-//   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-//   // Redirect if no registration data
-//   useEffect(() => {
-//     if (!registrationData) {
-//       navigate('/');
-//       return;
-//     }
-    
-//     // Pre-fill email and roll number
-//     updateFormField('email', registrationData.email);
-//     updateFormField('rollNumber', registrationData.rollNumber);
-//   }, [registrationData, navigate, updateFormField]);
-
-//   const validateForm = (): boolean => {
-//     const newErrors: FormErrors = {};
-
-//     // Required field validations
-//     const requiredFields = [
-//       'name', 'branch', 'year', 'mobileNumber', 'techSkills', 
-//       'softSkills', 'weakness', 'strength', 'whyJoinFlux', 
-//       'describeYourself', 'achievements'
-//     ];
-
-//     requiredFields.forEach(field => {
-//       if (!formData[field as keyof typeof formData] || 
-//           (typeof formData[field as keyof typeof formData] === 'string' && 
-//            !formData[field as keyof typeof formData]?.toString().trim())) {
-//         newErrors[field] = 'This field is required';
-//       }
-//     });
-
-//     // Mobile number validation
-//     if (formData.mobileNumber) {
-//       const mobileValidation = validateMobileNumber(formData.mobileNumber);
-//       if (!mobileValidation.isValid) {
-//         newErrors.mobileNumber = mobileValidation.error!;
-//       }
-//     }
-
-//     // Word count validations
-//     const wordCountFields = [
-//       { field: 'name', max: 50 },
-//       { field: 'techSkills', max: 150 },
-//       { field: 'softSkills', max: 200 },
-//       { field: 'weakness', max: 100 },
-//       { field: 'strength', max: 100 },
-//       { field: 'otherSociety', max: 100 },
-//       { field: 'whyJoinFlux', max: 150 },
-//       { field: 'describeYourself', max: 150 },
-//       { field: 'achievements', max: 200 }
-//     ];
-
-//     wordCountFields.forEach(({ field, max }) => {
-//       const value = formData[field as keyof typeof formData]?.toString() || '';
-//       if (value.trim()) {
-//         const wordValidation = validateWordCount(value, max);
-//         if (!wordValidation.isValid) {
-//           newErrors[field] = wordValidation.error!;
-//         }
-//       }
-//     });
-
-//     // Image validation
-//     if (formData.image) {
-//       const sizeValidation = validateFileSize(formData.image);
-//       if (!sizeValidation.isValid) {
-//         newErrors.image = sizeValidation.error!;
-//       }
-      
-//       const typeValidation = validateImageType(formData.image);
-//       if (!typeValidation.isValid) {
-//         newErrors.image = typeValidation.error!;
-//       }
-//     }
-
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-//   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (file) {
-//       updateFormField('image', file);
-      
-//       // Create preview
-//       const reader = new FileReader();
-//       reader.onload = (e) => {
-//         setImagePreview(e.target?.result as string);
-//       };
-//       reader.readAsDataURL(file);
-//     }
-//   };
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-    
-//     if (!validateForm()) {
-//       toast({
-//         title: "Validation Error",
-//         description: "Please fix the errors in the form before submitting.",
-//         variant: "destructive"
-//       });
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-
-//     try {
-//       // Simulate API call
-//       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-//       // Mock successful submission
-//       console.log('Form submitted:', formData);
-      
-//       setSubmitSuccess(true);
-      
-//       toast({
-//         title: "Registration Successful!",
-//         description: "Welcome to Flux Society! We'll contact you soon.",
-//         variant: "default"
-//       });
-
-//       // Redirect after success
-//       setTimeout(() => {
-//         navigate('/');
-//       }, 3000);
-      
-//     } catch (error) {
-//       toast({
-//         title: "Submission Failed",
-//         description: "Something went wrong. Please try again.",
-//         variant: "destructive"
-//       });
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   const getWordCount = (text: string) => {
-//     return text.trim() ? text.trim().split(/\s+/).length : 0;
-//   };
-
-//   if (submitSuccess) {
-//     return (
-//       <div className="min-h-screen bg-animated flex items-center justify-center px-6">
-//         <Card className="card-glow max-w-md w-full text-center animate-scale-in">
-//           <CardContent className="p-8">
-//             <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-glow">
-//               <CheckCircle2 className="w-10 h-10 text-success" />
-//             </div>
-//             <h2 className="text-2xl font-bold mb-4 text-foreground">
-//               Registration Complete!
-//             </h2>
-//             <p className="text-muted-foreground mb-6">
-//               Thank you for joining Flux Society. We're excited to have you on board!
-//             </p>
-//             <Badge className="bg-success/10 text-success border-success/20">
-//               Welcome to Flux! 🎉
-//             </Badge>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   }
-
-//   if (!registrationData) {
-//     return null; // Will redirect in useEffect
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-animated py-12 px-6">
-//       <div className="container mx-auto max-w-4xl">
-//         {/* Header */}
-//         <div className="text-center mb-12 animate-slide-up">
-//           <Button 
-//             variant="ghost" 
-//             onClick={() => navigate('/')}
-//             className="absolute top-6 left-6 text-muted-foreground hover:text-foreground"
-//           >
-//             <ArrowLeft className="w-4 h-4 mr-2" />
-//             Back to Home
-//           </Button>
-          
-//           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
-//             Join Flux Society
-//           </h1>
-//           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-//             Complete your registration to become part of MMMUT's premier tech community
-//           </p>
-//         </div>
-
-//         <form onSubmit={handleSubmit} className="space-y-8">
-//           {/* Personal Information */}
-//           <Card className="card-glow animate-slide-up animation-delay-200">
-//             <CardHeader>
-//               <CardTitle className="flex items-center text-primary">
-//                 <User className="w-5 h-5 mr-2" />
-//                 Personal Information
-//               </CardTitle>
-//             </CardHeader>
-//             <CardContent className="space-y-6">
-//               <div className="grid md:grid-cols-2 gap-6">
-//                 <div className="space-y-2">
-//                   <Label htmlFor="email">Email Address</Label>
-//                   <Input
-//                     id="email"
-//                     value={formData.email || ''}
-//                     disabled
-//                     className="bg-muted"
-//                   />
-//                 </div>
-                
 //                 <div className="space-y-2">
 //                   <Label htmlFor="rollNumber">Roll Number</Label>
 //                   <Input
@@ -557,10 +316,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { validateMobileNumber, validateWordCount, validateFileSize, validateImageType } from '@/utils/validation';
 import { uploadImageToCloudinary } from '@/lib/cloudinaryClient';
-import { saveRegistrationRecord, isSignInLink, completeSignInWithEmailLink } from '@/lib/firebase';
+import { saveRegistrationRecord, isSignInLink, completeSignInWithEmailLink, getRegistrationByRollNumber } from '@/lib/firebase';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm: React.FC = () => {
   const { registrationData, formData, updateFormField, setRegistrationData } = useRegistration();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { toast } = useToast();
@@ -586,12 +347,36 @@ const RegistrationForm: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Redirect immediately if not signed in
+  useEffect(() => {
+    if (!registrationData?.email) {
+      navigate('/');
+    }
+  }, [registrationData, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setIsSubmitting(true);
 
     try {
+      // Block if user hasn't signed in via the modal
+      if (!registrationData?.email) {
+        toast({ title: 'Not signed in', description: 'Please sign in with Google before submitting the form.', variant: 'destructive' });
+        navigate('/');
+        return;
+      }
+
+      // Ensure all required fields are present (projectLink is optional)
+      const requiredFields: (keyof typeof formData)[] = [
+        'name', 'branch', 'year', 'mobileNumber', 'techSkills', 'softSkills', 'weakness', 'strength', 'whyJoinFlux', 'describeYourself', 'achievements', 'rollNumber'
+      ];
+      for (const field of requiredFields) {
+        const val = formData[field];
+        if (!val || (typeof val === 'string' && !String(val).trim())) {
+          throw new Error('Please fill all required fields before submitting.');
+        }
+      }
       // ✅ Validate mobile number
       const mobileValidation = validateMobileNumber(formData.mobileNumber || '');
       if (!mobileValidation.isValid) throw new Error(mobileValidation.error);
@@ -625,6 +410,14 @@ const RegistrationForm: React.FC = () => {
         imageUrl = await uploadImageToCloudinary(file, 'flux-induction/profile-images');
       }
 
+      // ✅ Check roll number uniqueness
+      if (formData.rollNumber) {
+        const existingEmail = await getRegistrationByRollNumber(formData.rollNumber);
+        if (existingEmail && existingEmail !== formData.email) {
+          throw new Error('This roll number is already registered with another email.');
+        }
+      }
+
       // ✅ Save data in Firestore
       const record = {
         name: formData.name,
@@ -646,18 +439,19 @@ const RegistrationForm: React.FC = () => {
         submittedAt: new Date().toISOString(),
       };
 
-      await saveRegistrationRecord(formData.email, record);
+  await saveRegistrationRecord(formData.email, record);
 
       setSubmitSuccess(true);
       toast({
         title: 'Registration Successful!',
         description: 'Welcome to Flux Society! We will contact you soon.',
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
+      const message = err instanceof Error ? err.message : String(err);
       toast({
         title: 'Submission Failed',
-        description: err?.message || 'Something went wrong. Please try again.',
+        description: message || 'Something went wrong. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -666,11 +460,7 @@ const RegistrationForm: React.FC = () => {
   };
 
   if (!registrationData?.email) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">Please verify your email to continue.</p>
-      </div>
-    );
+    return null;
   }
 
   if (submitSuccess) {
@@ -697,6 +487,7 @@ const RegistrationForm: React.FC = () => {
                 id="name"
                 value={formData.name || ''}
                 onChange={(e) => updateFormField('name', e.target.value)}
+                placeholder="Your full name"
                 required
               />
             </div>
@@ -704,13 +495,17 @@ const RegistrationForm: React.FC = () => {
             {/* Email (read-only) */}
             <div>
               <Label>Email</Label>
-              <Input value={formData.email || ''} disabled />
+              <Input value={formData.email || ''} disabled placeholder="Sign in to populate email" />
             </div>
 
-            {/* Roll No (read-only) */}
+            {/* Roll No (editable but prefilled) */}
             <div>
               <Label>Roll Number</Label>
-              <Input value={formData.rollNumber || ''} disabled />
+              <Input
+                value={formData.rollNumber || ''}
+                onChange={(e) => updateFormField('rollNumber', e.target.value)}
+                required
+              />
             </div>
 
             {/* Branch */}
@@ -758,6 +553,7 @@ const RegistrationForm: React.FC = () => {
                 id="mobileNumber"
                 value={formData.mobileNumber || ''}
                 onChange={(e) => updateFormField('mobileNumber', e.target.value)}
+                placeholder="10-digit mobile number"
                 required
               />
             </div>
@@ -770,6 +566,7 @@ const RegistrationForm: React.FC = () => {
                 type="file"
                 accept="image/*"
                 onChange={(e) => updateFormField('image', e.target.files?.[0] || null)}
+                placeholder="Upload a clear portrait"
               />
             </div>
 
@@ -780,6 +577,7 @@ const RegistrationForm: React.FC = () => {
                 id="techSkills"
                 value={formData.techSkills || ''}
                 onChange={(e) => updateFormField('techSkills', e.target.value)}
+                placeholder="Languages, frameworks, tools"
               />
             </div>
 
@@ -800,6 +598,7 @@ const RegistrationForm: React.FC = () => {
                 id="softSkills"
                 value={formData.softSkills || ''}
                 onChange={(e) => updateFormField('softSkills', e.target.value)}
+                placeholder="Communication, teamwork, leadership"
               />
             </div>
 
@@ -809,6 +608,7 @@ const RegistrationForm: React.FC = () => {
                 id="weakness"
                 value={formData.weakness || ''}
                 onChange={(e) => updateFormField('weakness', e.target.value)}
+                placeholder="What would you like to improve?"
               />
             </div>
 
@@ -818,6 +618,7 @@ const RegistrationForm: React.FC = () => {
                 id="strength"
                 value={formData.strength || ''}
                 onChange={(e) => updateFormField('strength', e.target.value)}
+                placeholder="Your key strengths"
               />
             </div>
 
@@ -827,6 +628,7 @@ const RegistrationForm: React.FC = () => {
                 id="otherSociety"
                 value={formData.otherSociety || ''}
                 onChange={(e) => updateFormField('otherSociety', e.target.value)}
+                placeholder="Optional: clubs or societies"
               />
             </div>
 
@@ -836,6 +638,7 @@ const RegistrationForm: React.FC = () => {
                 id="whyJoinFlux"
                 value={formData.whyJoinFlux || ''}
                 onChange={(e) => updateFormField('whyJoinFlux', e.target.value)}
+                placeholder="Why do you want to join Flux?"
               />
             </div>
 
@@ -845,6 +648,7 @@ const RegistrationForm: React.FC = () => {
                 id="describeYourself"
                 value={formData.describeYourself || ''}
                 onChange={(e) => updateFormField('describeYourself', e.target.value)}
+                placeholder="A short intro about you"
               />
             </div>
 
@@ -854,6 +658,7 @@ const RegistrationForm: React.FC = () => {
                 id="achievements"
                 value={formData.achievements || ''}
                 onChange={(e) => updateFormField('achievements', e.target.value)}
+                placeholder="Notable projects, awards, competitions"
               />
             </div>
 

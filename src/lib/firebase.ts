@@ -1,7 +1,8 @@
 // src/lib/firebase.ts
 import { initializeApp } from 'firebase/app';
-import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, collection } from 'firebase/firestore';
+import { query, where, getDocs } from 'firebase/firestore';
 
 const FIREBASE_ENV = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
@@ -65,12 +66,38 @@ export const completeSignInWithEmailLink = async (maybeEmail?: string) => {
   return result;
 };
 
+/**
+ * Open Google popup and return the sign-in result.
+ * Caller can inspect result.user.email.
+ */
+export const signInWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  const result = await signInWithPopup(getAuth(), provider);
+  return result;
+};
+
 /** Firestore helpers to check & write registration record */
 export const checkEmailAlreadyRegistered = async (email: string) => {
   // We'll store registrations in collection 'registrations' where doc id = email
   const docRef = doc(db, 'registrations', email);
   const snap = await getDoc(docRef);
   return snap.exists();
+};
+
+/**
+ * Check whether a roll number is already used by any registration.
+ * Returns the email of the existing registration if found, otherwise null.
+ */
+export const getRegistrationByRollNumber = async (rollNumber: string): Promise<string | null> => {
+  const q = query(collection(db, 'registrations'), where('rollNumber', '==', rollNumber));
+  const snaps = await getDocs(q);
+  if (!snaps.empty) {
+    const first = snaps.docs[0];
+    const data = first.data();
+    return data.email || first.id || null;
+  }
+  return null;
 };
 
 export const saveRegistrationRecord = async (email: string, data: any) => {
